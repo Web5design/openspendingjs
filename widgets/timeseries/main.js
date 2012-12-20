@@ -99,18 +99,18 @@ OpenSpending.TimeSeries = function (elem, context, state) {
     }
     $(self.$e).show();
 
-    var graph = new Rickshaw.Graph({
+    self.graph = new Rickshaw.Graph({
       element: self.$e[0],
       width: 700,
       height: 500,
-      renderer: 'line',
+      renderer: self.context.renderer || 'line',
       series: self.data
     });
 
-    var x_axis = new Rickshaw.Graph.Axis.Time({ graph: graph });
+    var x_axis = new Rickshaw.Graph.Axis.Time({ graph: self.graph });
 
     var y_axis = new Rickshaw.Graph.Axis.Y({
-      graph: graph,
+      graph: self.graph,
       orientation: 'left',
       tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
       element: document.getElementById('y_axis'),
@@ -118,24 +118,24 @@ OpenSpending.TimeSeries = function (elem, context, state) {
 
     var legend = new Rickshaw.Graph.Legend({
       element: document.querySelector('#legend'),
-      graph: graph
+      graph: self.graph
     });
 
     var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
-        graph: graph,
+        graph: self.graph,
         legend: legend
     });
 
     var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
-        graph: graph,
+        graph: self.graph,
         legend: legend
     });
 
     var hoverDetail = new Rickshaw.Graph.HoverDetail({
-        graph: graph
+        graph: self.graph
     });
 
-    graph.render();
+    self.graph.render();
   };
 
   // The rest of this function is suitable for copypasta into other
