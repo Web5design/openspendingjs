@@ -10,11 +10,42 @@ OpenSpending.TimeSeries = function (elem, context, state) {
                  OpenSpending.scriptRoot + "/widgets/timeseries/js/d3.layout.min.js",
                  OpenSpending.scriptRoot + "/widgets/timeseries/js/rickshaw.min.js",
                  OpenSpending.scriptRoot + "/widgets/timeseries/css/rickshaw.min.css",
+                 OpenSpending.scriptRoot + "/app/bob/bob.js",
                  OpenSpending.scriptRoot + "/lib/aggregator.js"
                  ];
 
   self.context = context;
   self.state = state;
+
+  self.configure = function(endConfigure) {
+    self.$qb.empty();
+    var qb = new OpenSpending.Widgets.QueryBuilder(
+      self.$qb, self.update, endConfigure, self.context, [
+            {
+              variable: 'drilldowns',
+              label: 'Tiles:',
+              type: 'select',
+              'default': self.state.drilldowns,
+              help: 'Each selected dimension will display as an additional level of tiles for the treemap.'
+            },
+            {
+              variable: 'year',
+              label: 'Year:',
+              type: 'slider',
+              dimension: 'time',
+              attribute: 'year',
+              help: 'Filter by year.'
+            },
+            {
+              variable: 'cuts',
+              label: 'Filters:',
+              type: 'cuts',
+              'default': self.state.cuts,
+              help: 'Limit the set of data to display.'
+            }
+          ]
+    );
+  };
 
   self.update = function(state) {
     self.state = state;
@@ -42,7 +73,7 @@ OpenSpending.TimeSeries = function (elem, context, state) {
         siteUrl: self.context.siteUrl,
         dataset: self.context.dataset,
         drilldowns: self.state.drilldowns,
-        order: self.state.order,
+        order: self.context.order,
         cuts: cuts,
         rootNodeLabel: 'Total',
         callback: function(data) {
@@ -58,6 +89,7 @@ OpenSpending.TimeSeries = function (elem, context, state) {
 
   self.init = function () {
     self.$e = elem;
+    self.$qb = elem.prev();
     self.palette = new Rickshaw.Color.Palette();
     self.update(self.state);
   };
@@ -70,7 +102,7 @@ OpenSpending.TimeSeries = function (elem, context, state) {
 
   self.setNode = function (node) {
     var data = [];
-    var results = node.children.slice(0, self.state.pagesize);
+    var results = node.children.slice(0, self.context.numberOfEntities);
     for (var i in results) {
       var result = results[i];
       var resultData = {
